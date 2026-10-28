@@ -27,7 +27,7 @@ npm run dev
 
 | חלק | איפה |
 |---|---|
-| לקוח (React) | Firebase Hosting - https://common-react.web.app |
+| לקוח (React) | Firebase Hosting - https://common-react-714c4.web.app |
 | שרת (ASP.NET Core) | Google Cloud Run - `photorental-api` |
 | מסד נתונים | Firebase Firestore |
 
