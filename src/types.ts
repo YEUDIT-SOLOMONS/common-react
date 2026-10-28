@@ -1,4 +1,28 @@
-export type Role = 'Admin' | 'Owner' | 'Renter'
+export type Role = 'Admin' | 'Viewer' | 'Owner' | 'Renter'
+
+export interface VisitDay {
+  day: string
+  visits: number
+  newVisitors: number
+}
+
+export interface DashboardCall {
+  kind: string
+  status: string
+  itemName: string
+  createdAtUtc: string
+}
+
+export interface Dashboard {
+  members: number
+  newMembersLast30Days: number
+  activeRentals: number
+  rentalsLast30Days: number
+  returnedRentals: number
+  visits: VisitDay[]
+  callResultsLast30Days: Record<string, number>
+  recentCalls: DashboardCall[]
+}
 
 export interface User {
   id: string

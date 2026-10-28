@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 const navClass = ({ isActive }: { isActive: boolean }) => (isActive ? 'nav-pill nav-pill-active' : 'nav-pill')
 
 export function Navbar() {
-  const { user, isAdmin, logout } = useAuth()
+  const { user, isAdmin, canViewDashboard, logout } = useAuth()
   const navigate = useNavigate()
 
   function handleLogout() {
@@ -31,15 +31,16 @@ export function Navbar() {
               <NavLink to="/items/new" className={navClass}>
                 הוספת פריט
               </NavLink>
-              {isAdmin && (
+              {canViewDashboard && (
                 <NavLink to="/admin" className={navClass}>
-                  ניהול
+                  לוח נתונים
                 </NavLink>
               )}
             </nav>
             <div className="navbar-user">
               <span className="navbar-name">{user.name}</span>
               {isAdmin && <span className="badge badge-admin">מנהלת</span>}
+              {user.role === 'Viewer' && <span className="badge badge-admin">צפייה בנתונים</span>}
               <button type="button" className="btn btn-ghost btn-small" onClick={handleLogout}>
                 יציאה
               </button>

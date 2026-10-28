@@ -1,62 +1,65 @@
 import { useMemo } from 'react'
 import { useItems } from '../hooks/useItems'
 import { useCategories } from '../hooks/useCategories'
+import { useDashboard } from '../hooks/useDashboard'
+import { itemStats } from '../utils/itemStats'
+import { CALL_STATUS_LABELS } from '../labels'
 import { Loader } from '../components/Loader'
 import { ErrorMessage } from '../components/ErrorMessage'
+import { StatCard } from '../components/StatCard'
 import { StatBars } from '../components/StatBars'
-import type { Item } from '../types'
-
-function countBy(items: Item[], getKey: (item: Item) => string): [string, number][] {
-  const counts = new Map<string, number>()
-  for (const item of items) {
-    const key = getKey(item)
-    counts.set(key, (counts.get(key) ?? 0) + 1)
-  }
-  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6)
-}
+import { VisitsChart } from '../components/VisitsChart'
+import { RecentCalls } from '../components/RecentCalls'
+import { RecentItems } from '../components/RecentItems'
 
 export function AdminPage() {
-  const { data: items = [], isLoading, isError, error } = useItems()
+  const itemsQuery = useItems()
+  const dashboardQuery = useDashboard()
   const { data: categories = [] } = useCategories()
 
-  const stats = useMemo(() => {
-    const categoryNames = new Map(categories.map((c) => [c.id, c.label]))
-    const owners = new Set(items.map((item) => item.ownerId))
-    const totalPrice = items.reduce((sum, item) => sum + item.dailyPrice, 0)
+  const stats = useMemo(() => itemStats(itemsQuery.data ?? [], categories), [itemsQuery.data, categories])
 
-    return {
-      total: items.length,
-      owners: owners.size,
-      averagePrice: items.length ? Math.round(totalPrice / items.length) : 0,
-      byCategory: countBy(items, (item) => categoryNames.get(item.categoryId ?? '') ?? 'ללא קטגוריה'),
-      byCity: countBy(items, (item) => item.city ?? 'לא צוין'),
-    }
-  }, [items, categories])
+  if (itemsQuery.isLoading || dashboardQuery.isLoading) return <Loader text="טוען נתונים..." />
+  if (itemsQuery.isError) return <ErrorMessage error={itemsQuery.error} onRetry={() => itemsQuery.refetch()} />
+  if (dashboardQuery.isError) return <ErrorMessage error={dashboardQuery.error} onRetry={() => dashboardQuery.refetch()} />
 
-  if (isLoading) return <Loader text="טוען נתונים..." />
-  if (isError) return <ErrorMessage error={error} />
+  const dashboard = dashboardQuery.data!
+  const callResults = Object.entries(dashboard.callResultsLast30Days)
+    .map(([status, count]): [string, number] => [CALL_STATUS_LABELS[status] ?? status, count])
+    .sort((a, b) => b[1] - a[1])
 
   return (
     <section>
-      <h1>לוח ניהול</h1>
+      <h1>לוח נתונים</h1>
+
       <div className="stat-cards">
-        <div className="stat-card stat-pink">
-          <span className="stat-value">{stats.total}</span>
-          <span>פריטים להשכרה</span>
-        </div>
-        <div className="stat-card stat-blue">
-          <span className="stat-value">{stats.owners}</span>
-          <span>משכירות</span>
-        </div>
-        <div className="stat-card stat-green">
-          <span className="stat-value">₪{stats.averagePrice}</span>
-          <span>מחיר ממוצע ליום</span>
+        <StatCard value={dashboard.members} label={`חברות בקהילה (${dashboard.newMembersLast30Days} חדשות החודש)`} color="pink" />
+        <StatCard value={dashboard.activeRentals} label="השכרות פעילות עכשיו" color="blue" />
+        <StatCard value={dashboard.rentalsLast30Days} label="השכרות ב-30 הימים האחרונים" color="green" />
+        <StatCard value={stats.total} label="פריטים להשכרה" color="blue" />
+        <StatCard value={stats.owners} label="משכירות עם ציוד" color="green" />
+        <StatCard value={`₪${stats.averagePrice}`} label="מחיר ממוצע ליום" color="pink" />
+      </div>
+
+      <VisitsChart days={dashboard.visits} />
+
+      <div className="panel-columns">
+        <RecentCalls calls={dashboard.recentCalls} />
+        <div className="panel">
+          <StatBars title="תוצאות שיחות (30 יום)" rows={callResults} />
         </div>
       </div>
-      <div className="stat-columns">
-        <StatBars title="קטגוריות מובילות" rows={stats.byCategory} />
-        <StatBars title="ערים מובילות" rows={stats.byCity} />
+
+      <div className="panel-columns">
+        <div className="panel">
+          <StatBars title="קטגוריות מובילות" rows={stats.byCategory} />
+        </div>
+        <div className="panel">
+          <StatBars title="ערים מובילות" rows={stats.byCity} />
+        </div>
       </div>
+
+      <RecentItems items={stats.newest} />
     </section>
   )
 }
