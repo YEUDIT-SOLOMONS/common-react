@@ -10,7 +10,6 @@ const USER_KEY = 'common.user'
 interface AuthContextValue {
   user: User | null
   isAdmin: boolean
-  canViewDashboard: boolean
   login: (values: LoginValues) => Promise<void>
   register: (values: RegisterValues) => Promise<void>
   updateUser: (user: User) => void
@@ -73,7 +72,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     user,
     isAdmin: user?.role === 'Admin',
-    canViewDashboard: user?.role === 'Admin' || user?.role === 'Viewer',
     login,
     register,
     updateUser,
