@@ -1,0 +1,21 @@
+{
+  "hosting": {
+    "site": "common-react",
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": { "serviceId": "photorental-api", "region": "me-west1" }
+      },
+      {
+        "source": "/img/**",
+        "run": { "serviceId": "photorental-api", "region": "me-west1" }
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}
