@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useCategories } from '../hooks/useCategories'
+import { FormField } from './FormField'
 import { ErrorMessage } from './ErrorMessage'
 import type { ItemFormValues } from '../types'
 
@@ -30,46 +31,44 @@ export function ItemForm({ defaultValues = EMPTY_VALUES, submitText, isSubmittin
 
   return (
     <form className="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-      <label htmlFor="name">שם הפריט</label>
-      <input
-        id="name"
-        {...register('name', {
-          required: 'יש להזין שם',
-          minLength: { value: 2, message: 'לפחות 2 תווים' },
-          maxLength: { value: 80, message: 'עד 80 תווים' },
-        })}
-      />
-      {errors.name && <span className="field-error">{errors.name.message}</span>}
+      <FormField id="name" label="שם הפריט" error={errors.name}>
+        <input
+          id="name"
+          {...register('name', {
+            required: 'יש להזין שם',
+            minLength: { value: 2, message: 'לפחות 2 תווים' },
+            maxLength: { value: 80, message: 'עד 80 תווים' },
+          })}
+        />
+      </FormField>
 
-      <label htmlFor="categoryId">קטגוריה</label>
-      <select id="categoryId" disabled={categoriesLoading} {...register('categoryId', { required: 'יש לבחור קטגוריה' })}>
-        <option value="">{categoriesLoading ? 'טוען קטגוריות...' : 'בחרי קטגוריה'}</option>
-        {categories.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.label}
-          </option>
-        ))}
-      </select>
-      {errors.categoryId && <span className="field-error">{errors.categoryId.message}</span>}
+      <FormField id="categoryId" label="קטגוריה" error={errors.categoryId}>
+        <select id="categoryId" disabled={categoriesLoading} {...register('categoryId', { required: 'יש לבחור קטגוריה' })}>
+          <option value="">{categoriesLoading ? 'טוען קטגוריות...' : 'בחרי קטגוריה'}</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.label}
+            </option>
+          ))}
+        </select>
+      </FormField>
 
-      <label htmlFor="description">תיאור</label>
-      <textarea
-        id="description"
-        rows={4}
-        {...register('description', {
-          required: 'יש להזין תיאור',
-          minLength: { value: 10, message: 'לפחות 10 תווים' },
-        })}
-      />
-      {errors.description && <span className="field-error">{errors.description.message}</span>}
+      <FormField id="description" label="תיאור" error={errors.description}>
+        <textarea
+          id="description"
+          rows={4}
+          {...register('description', {
+            required: 'יש להזין תיאור',
+            minLength: { value: 10, message: 'לפחות 10 תווים' },
+          })}
+        />
+      </FormField>
 
       <div className="form-row">
-        <div>
-          <label htmlFor="dailyPrice">מחיר ליום (₪)</label>
+        <FormField id="dailyPrice" label="מחיר ליום (₪)" error={errors.dailyPrice}>
           <input
             id="dailyPrice"
             type="number"
-            step="1"
             {...register('dailyPrice', {
               valueAsNumber: true,
               required: 'יש להזין מחיר',
@@ -77,11 +76,9 @@ export function ItemForm({ defaultValues = EMPTY_VALUES, submitText, isSubmittin
               max: { value: 10000, message: 'מחיר גבוה מדי' },
             })}
           />
-          {errors.dailyPrice && <span className="field-error">{errors.dailyPrice.message}</span>}
-        </div>
+        </FormField>
 
-        <div>
-          <label htmlFor="quantity">כמות</label>
+        <FormField id="quantity" label="כמות" error={errors.quantity}>
           <input
             id="quantity"
             type="number"
@@ -92,11 +89,9 @@ export function ItemForm({ defaultValues = EMPTY_VALUES, submitText, isSubmittin
               max: { value: 50, message: 'עד 50' },
             })}
           />
-          {errors.quantity && <span className="field-error">{errors.quantity.message}</span>}
-        </div>
+        </FormField>
 
-        <div>
-          <label htmlFor="minRentalAmount">מינימום ימי השכרה</label>
+        <FormField id="minRentalAmount" label="מינימום ימי השכרה" error={errors.minRentalAmount}>
           <input
             id="minRentalAmount"
             type="number"
@@ -106,8 +101,7 @@ export function ItemForm({ defaultValues = EMPTY_VALUES, submitText, isSubmittin
               max: { value: 30, message: 'עד 30 ימים' },
             })}
           />
-          {errors.minRentalAmount && <span className="field-error">{errors.minRentalAmount.message}</span>}
-        </div>
+        </FormField>
       </div>
 
       {submitError != null && <ErrorMessage error={submitError} />}

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useItem } from '../hooks/useItems'
 import { useCategories } from '../hooks/useCategories'
@@ -6,13 +5,13 @@ import { usePermissions } from '../hooks/usePermissions'
 import { Loader } from '../components/Loader'
 import { ErrorMessage } from '../components/ErrorMessage'
 import { StatusBadge } from '../components/StatusBadge'
+import { ImageGallery } from '../components/ImageGallery'
 
 export function ItemDetailsPage() {
   const { id } = useParams<{ id: string }>()
   const { data: item, isLoading, isError, error } = useItem(id!)
   const { data: categories = [] } = useCategories()
   const { canEdit } = usePermissions()
-  const [selectedImage, setSelectedImage] = useState(0)
 
   if (isLoading) return <Loader />
   if (isError || !item) return <ErrorMessage error={error} />
@@ -21,36 +20,13 @@ export function ItemDetailsPage() {
   const categoryName = categories.find((c) => c.id === item.categoryId)?.label ?? 'ללא קטגוריה'
 
   return (
-    <section className="details">
+    <section>
       <Link to="/items" className="back-link">
         → חזרה לכל הציוד
       </Link>
 
       <div className="details-grid">
-        <div className="gallery">
-          <div className="gallery-main">
-            {images.length > 0 ? (
-              <img src={images[selectedImage]} alt={item.name} />
-            ) : (
-              <span className="item-card-noimage">אין תמונה</span>
-            )}
-          </div>
-          {images.length > 1 && (
-            <div className="gallery-thumbs">
-              {images.map((src, index) => (
-                <button
-                  key={src}
-                  type="button"
-                  className={index === selectedImage ? 'thumb thumb-active' : 'thumb'}
-                  onClick={() => setSelectedImage(index)}
-                  aria-label={`תמונה ${index + 1}`}
-                >
-                  <img src={src} alt="" />
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+        <ImageGallery images={images} alt={item.name} />
 
         <div className="details-info">
           <StatusBadge status={item.status} />

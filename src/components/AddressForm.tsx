@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form'
 import { useMutation } from '@tanstack/react-query'
 import { updateAddress } from '../api/users'
 import { useAuth } from '../context/AuthContext'
+import { FormField } from './FormField'
 import { ErrorMessage } from './ErrorMessage'
 import type { AddressValues } from '../types'
 
@@ -19,28 +20,24 @@ export function AddressForm() {
   })
 
   return (
-    <form className="form address-form" onSubmit={handleSubmit((values) => mutation.mutate(values))} noValidate>
+    <form className="form" onSubmit={handleSubmit((values) => mutation.mutate(values))} noValidate>
       <p className="form-note">לפני הפריט הראשון צריך להזין כתובת. היא משמשת לכל הפריטים שלך, ורק העיר מוצגת לאחרות.</p>
 
-      <label htmlFor="address">רחוב ומספר בית</label>
-      <input id="address" {...register('address', { required: 'יש להזין רחוב ומספר' })} />
-      {errors.address && <span className="field-error">{errors.address.message}</span>}
+      <FormField id="address" label="רחוב ומספר בית" error={errors.address}>
+        <input id="address" {...register('address', { required: 'יש להזין רחוב ומספר' })} />
+      </FormField>
 
-      <label htmlFor="city">עיר</label>
-      <input id="city" {...register('city', { required: 'יש להזין עיר' })} />
-      {errors.city && <span className="field-error">{errors.city.message}</span>}
+      <FormField id="city" label="עיר" error={errors.city}>
+        <input id="city" {...register('city', { required: 'יש להזין עיר' })} />
+      </FormField>
 
       <div className="form-row form-row-2">
-        <div>
-          <label htmlFor="addressFloor">קומה</label>
+        <FormField id="addressFloor" label="קומה" error={errors.addressFloor}>
           <input id="addressFloor" {...register('addressFloor', { required: 'יש להזין קומה' })} />
-          {errors.addressFloor && <span className="field-error">{errors.addressFloor.message}</span>}
-        </div>
-        <div>
-          <label htmlFor="addressApartment">דירה / שם משפחה</label>
+        </FormField>
+        <FormField id="addressApartment" label="דירה / שם משפחה" error={errors.addressApartment}>
           <input id="addressApartment" {...register('addressApartment', { required: 'שדה חובה' })} />
-          {errors.addressApartment && <span className="field-error">{errors.addressApartment.message}</span>}
-        </div>
+        </FormField>
       </div>
 
       {mutation.isError && <ErrorMessage error={mutation.error} />}

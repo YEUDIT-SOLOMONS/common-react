@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { FormField } from '../components/FormField'
 import { ErrorMessage } from '../components/ErrorMessage'
+import { EMAIL_RULES } from '../validation'
 import type { LoginValues } from '../types'
 
 export function LoginPage() {
@@ -36,31 +38,19 @@ export function LoginPage() {
       <h1>התחברות</h1>
       <p className="auth-subtitle">שמחות לראות אותך שוב!</p>
       <form className="form" onSubmit={handleSubmit(onSubmit)} noValidate>
-        <label htmlFor="email">אימייל</label>
-        <input
-          id="email"
-          type="email"
-          dir="ltr"
-          autoComplete="email"
-          {...register('email', {
-            required: 'יש להזין אימייל',
-            pattern: { value: /^\S+@\S+\.\S+$/, message: 'כתובת אימייל לא תקינה' },
-          })}
-        />
-        {errors.email && <span className="field-error">{errors.email.message}</span>}
+        <FormField id="email" label="אימייל" error={errors.email}>
+          <input id="email" type="email" dir="ltr" autoComplete="email" {...register('email', EMAIL_RULES)} />
+        </FormField>
 
-        <label htmlFor="password">סיסמה</label>
-        <input
-          id="password"
-          type="password"
-          dir="ltr"
-          autoComplete="current-password"
-          {...register('password', {
-            required: 'יש להזין סיסמה',
-            minLength: { value: 6, message: 'לפחות 6 תווים' },
-          })}
-        />
-        {errors.password && <span className="field-error">{errors.password.message}</span>}
+        <FormField id="password" label="סיסמה" error={errors.password}>
+          <input
+            id="password"
+            type="password"
+            dir="ltr"
+            autoComplete="current-password"
+            {...register('password', { required: 'יש להזין סיסמה' })}
+          />
+        </FormField>
 
         {serverError != null && <ErrorMessage error={serverError} />}
 

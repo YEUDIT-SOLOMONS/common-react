@@ -389,6 +389,12 @@ textarea:focus-visible {
   text-align: right;
 }
 
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .form label {
   margin-top: 12px;
   font-size: 15px;
